@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang='en'>
+<head>
+<meta charset='utf-8'>
+<title>Ajax example accordion</title>
+</head>
+
+<script>
+var $$$={};
+
+$$$.model = {
+    "onStartup": [],
+    "accordions": []
+};
+
+
+$$$.toAccordion=function(accordion){
+    
+    let children=accordion.childNodes;
+    alert("accordian called for "+accordion.nodeName);
+
+    let panels=[];
+    let x=0;
+    while(x<children.length){
+        //alert(children[x].nodeName);
+        if(children[x].nodeName=="H3") panels[panels.length]=children[x];
+        if(children[x].nodeName=="DIV") panels[panels.length]=children[x];
+        ++x;
+    }
+    if(panels.length%2!=0) throw "headings and division malformed to create accordion";
+    for(let x=0; x<panels.length; x+=2){
+        if(panels[x].nodeName!="H3") throw "headings and division malformed to create accordion";
+        if(panels[x+1].nodeName!="DIV") throw "headings and division malformed to create accordion";
+    }
+    
+    function onClickAccordionHandler(accordionIndex,x)
+    {
+        return function(){
+            onClickAccordionHandlerFunctionality(accordionIndex,x);
+        };
+    };
+    
+    function onClickAccordionHandlerFunctionality(accordionIndex,panelIndex){
+        if($$$.model.accordions[accordionIndex].displaying !=- 1){
+            $$$.model.accordions[accordionIndex].panels[$$$.model.accordions[accordionIndex].displaying+1].style.display='none';
+        }
+        $$$.model.accordions[accordionIndex].displaying=panelIndex;
+        $$$.model.accordions[accordionIndex].panels[panelIndex+1].style.display=$$$.model.accordions[accordionIndex].panels[panelIndex+1].oldDisplay;
+    
+    }
+
+    for(let x=0; x<panels.length; x+=2)
+    {
+        panels[x].onclick=onClickAccordionHandler($$$.model.accordions.length ,x);
+        panels[x+1].oldDisplay=panels[x+1].style.display;
+        panels[x+1].style.display="none";
+    }
+
+    $$$.model.accordions[$$$.model.accordions.length]={
+        "panels":panels,
+        "displaying":-1
+    };
+
+
+};
+
+
+$$$.onDocumentLoaded=function(func){
+    if(typeof func != "function") throw "onDocumentLoaded requires function type argument when call is placed. '"+typeof func+"' not valid";
+    $$$.model.onStartup[$$$.model.onStartup.length]=func;
+};
+
+
+$$$.initializeFramework=function(){
+
+    let elements=document.getElementsByTagName("*");
+    //alert(elements.length);
+
+    for(let i=0; i<elements.length; ++i) {
+        
+        if(elements[i].hasAttribute("accordion")) //condition for accordion attribute from document element
+        {
+            //alert(elements[i].nodeName+"has accordion");
+            if(elements[i].getAttribute("accordion")=="true" || elements[i].getAttribute("accordion")=="")
+            {
+                $$$.onDocumentLoaded(function(){
+                    $$$.toAccordion(elements[i]);
+                });
+            }
+            //alert(elements[i].getAttribute("accordion")=="");
+        }
+    }
+    
+    let x=0;
+    for(x=0; x<$$$.model.onStartup.length; ++x){
+        $$$.model.onStartup[x]();
+    }
+    
+};
+
+window.addEventListener('load',function (){ 
+    $$$.initializeFramework() 
+});
+
+</script>
+
+<body>
+
+<div accordion>
+<h3> Heading 1</h3>
+<div>
+1 whatever whatever
+2 whatever whatever
+3 whatever whatever
+4 whatever whatever
+5 whatever whatever
+6 whatever whatever
+7 whatever whatever
+</div>
+<h3> Heading 2</h3>
+<div>
+11 whatever whatever
+22 whatever whatever
+33 whatever whatever
+44 whatever whatever
+55 whatever whatever
+66 whatever whatever
+77 whatever whatever
+</div>
+
+<h3> Heading 3</h3>
+<div>
+111 whatever whatever
+222 whatever whatever
+333 whatever whatever
+444 whatever whatever
+555 whatever whatever
+666 whatever whatever
+777 whatever whatever
+</div>
+
+</div>
+
+
+<div accordion=true>
+    <h3> Heading 1000</h3>
+    <div>
+    1 whatever whatever
+    2 whatever whatever
+    3 whatever whatever
+    4 whatever whatever
+    5 whatever whatever
+    6 whatever whatever
+    7 whatever whatever
+    </div>
+    <h3> Heading 2000</h3>
+    <div>
+    11 whatever whatever
+    22 whatever whatever
+    33 whatever whatever
+    44 whatever whatever
+    55 whatever whatever
+    66 whatever whatever
+    77 whatever whatever
+    </div>
+    
+    <h3> Heading 3000</h3>
+    <div>
+    111 whatever whatever
+    222 whatever whatever
+    333 whatever whatever
+    444 whatever whatever
+    555 whatever whatever
+    666 whatever whatever
+    777 whatever whatever
+    </div>
+    
+</div>
+    
+
+</body>
+
+
+</html>

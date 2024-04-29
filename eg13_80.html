@@ -1,0 +1,313 @@
+<!doctype html >
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>table_grid eg13_80_mine</title>
+
+    <style> 
+        .tmjrock_tablegrid_header_division{
+        overflow-x:hidden ;
+        overflow-y: hidden ;
+    }
+
+    .tmjrock_tablegrid_head{
+        /*
+        margin: 4px;
+        margin-bottom:0px;
+        */
+        border-bottom:0px;
+        border-spacing: 0px;
+        border-collapse: collapse;
+        background: bisque;
+    }
+    .tmjrock_tablegrid_head td{
+        border:1px groove blue;
+        border-bottom: 0px;
+        width: 50px;
+        text-align: right;
+        
+    }
+    .tmjrock_tablegrid_head td+td{
+        width: 100px;
+        text-align: right;
+    }
+    .tmjrock_tablegrid_head td+td+td{
+        width: 200px;
+        text-align: left;
+    }
+
+
+    .tmjrock_tablegrid_body_division{
+        overflow-x: auto;
+        overflow-y: auto ;
+        height: 400px;
+    }
+
+    .tmjrock_tablegrid_body{
+        /*margin: 4px;
+        margin-top:0px;
+        */
+        border-spacing: 0px;
+        border-collapse: collapse;
+        
+    }
+
+    .tmjrock_tablegrid_body td{
+        border: 1px groove red;
+        width: 50px;
+        text-align: right;
+    }
+
+    .tmjrock_tablegrid_body td+td{
+        width: 100px;
+        text-align: right;
+        
+    }
+    .tmjrock_tablegrid_body td+td+td{
+        width: 200px;
+        text-align: left;
+    }
+
+    
+    .tmjrock_tmgrid_pagination_division {
+        text-align: center;
+        margin-top: 10px; /* Adjust the margin top as needed */
+        width: 100%; /* Ensure the division spans the full width */
+    }
+
+
+    .tmjrock_tmgrid_pagination {
+        display: inline-block; /* Ensure the table is displayed as inline-block */
+    }
+
+    .tmjrock_tmgrid_pagination td{
+        width: 30px;
+    }
+
+
+    </style>
+    
+</head>
+
+<script>
+
+class Student
+{
+    constructor(rollNumber,name,nameOfMother,nameOfFather){
+        this.rollNumber=rollNumber;
+        this.name=name;
+        this.nameOfMother=nameOfMother;
+        this.nameOfFather=nameOfFather;
+    }
+}
+
+class Grid
+{
+
+    constructor(dataTableId,paginationTableId,students,pageSize){
+        this.dataTableId=dataTableId;
+        this.paginationTableId=paginationTableId;
+        this.students=students;
+        this.pageSize=pageSize;
+        this.pageNumber=1;
+        this.numberOfPaginationControls=5;
+        this.update();
+        this.updatePagination();
+    }
+    toggleTo(pageNumber){
+        this.pageNumber=pageNumber;
+        this.update();
+        this.updatePagination();
+    }
+    
+    update(){
+        //alert('update got called');
+
+        var dataTable=document.getElementById(this.dataTableId);
+        
+        //removing old data from table
+        var childrens=dataTable.children;
+        for(let i=0; i<childrens.length; )
+        {
+            childrens[i].remove();
+        }
+
+        var tr;
+        var td;
+        
+        //adding data as per page number from students
+        var student;
+
+        var startIndex=(this.pageNumber-1)*this.pageSize;
+        var endIndex=startIndex+this.pageSize;
+        if(endIndex>this.students.length) endIndex=this.students.length;
+        for(let i=startIndex; i<endIndex; ++i){
+
+            student=this.students[i];
+            tr=document.createElement('tr');
+    
+            td=document.createElement('td');
+            td.innerHTML=i+1;
+            tr.appendChild(td);
+
+            td=document.createElement('td');
+            td.innerHTML=student.rollNumber;
+            tr.appendChild(td);
+
+            td=document.createElement('td');
+            td.innerHTML=student.name;
+            tr.appendChild(td);
+
+            td=document.createElement('td');
+            td.innerHTML=student.nameOfMother;
+            tr.appendChild(td);
+
+            td=document.createElement('td');
+            td.innerHTML=student.nameOfFather;
+            tr.appendChild(td);
+            
+            dataTable.appendChild(tr);
+        }
+
+    }
+    updatePagination()
+    {
+        var paginationTable=document.getElementById(this.paginationTableId);
+        var childrens;
+        //removing page index table if exists
+        if(paginationTable!=null){
+            childrens=paginationTable.children;
+            for(let i=0; i<childrens.length; )
+            {
+                childrens[i].remove();
+            }
+        }
+
+        //now creating data Table Pagination 
+
+        var tr;
+        var td;
+
+
+        var numberOfPages=parseInt(this.students.length / this.pageSize); // last most page number
+        if(this.students.length % this.pageSize) numberOfPages=numberOfPages+1;
+        //alert("numberOfPages:"+numberOfPages);
+
+
+        var startPageIndex=(parseInt( (this.pageNumber-1)/this.numberOfPaginationControls) )*this.numberOfPaginationControls+1; // starting index for current pagination table
+        var lastPageIndex=numberOfPages+1;
+        if(lastPageIndex>startPageIndex+this.numberOfPaginationControls) lastPageIndex=startPageIndex+this.numberOfPaginationControls;
+
+        tr=document.createElement('tr');
+        var anchor;
+
+        if(startPageIndex>1){  // creating previous page link when startPageIndex of pagination control table is gretaer then 1
+            td=document.createElement('td');
+            anchor=document.createElement('a');
+            anchor.innerText='Previous';
+            anchor.href='javascript:model.grid.toggleTo('+(startPageIndex-1)+')';
+
+            td.appendChild(anchor);
+            tr.appendChild(td);
+        }
+
+        for(let i=startPageIndex; i<lastPageIndex; ++i) // creating pagination control links for pagination table
+        {
+            td=document.createElement('td');            
+            if(i==this.pageNumber){
+                td.innerHTML='<b>'+i+'</b>';
+            }
+            else{
+                anchor=document.createElement('a');
+                anchor.innerText=i;
+                anchor.href='javascript:model.grid.toggleTo('+(i)+')';
+                td.appendChild(anchor);
+            }
+            tr.appendChild(td);
+        }
+
+        if(lastPageIndex<numberOfPages){ // creating next link for pagination control table when lastPageIndex is lesser then numberOfPages
+            td=document.createElement('td');
+            anchor=document.createElement('a');
+            anchor.innerText='Next';
+            anchor.href='javascript:model.grid.toggleTo('+(lastPageIndex)+')';
+            td.appendChild(anchor);
+            tr.appendChild(td);
+        }
+
+        paginationTable.appendChild(tr);
+    }
+}
+
+var model={
+    "grid":null
+};
+
+function loader()
+{
+    
+    var students=new Array();
+    for(let i=101; i<1000; ++i){
+        students.push(new Student(i,i+'name',i+'mother',i+'father'));
+    }
+    //alert("number of students:"+ students.length);
+    //alert("number of pages "+students.length/10);
+    model.grid=new Grid('dataTable','dataTablePagination',students,20);
+
+}
+
+window.addEventListener('load',loader);
+
+
+
+</script>
+
+
+<!-- user specific style-->
+<style>
+    .somestyle{
+        border: 1px solid black;
+        width:790px;
+        height:600px;
+        overflow: auto;
+    }
+
+
+</style>
+
+<body>
+    <div class="somestyle">
+        <div class="tmjrock_tablegrid_header_division">
+            <table class="tmjrock_tablegrid_head">
+            <tr> 
+                <td>S.no</td> <td>Roll number</td> <td>Name</td> <td>Mother</td> <td>Father</td>
+            </tr>
+            </table>
+        </div>
+        
+        <div class="tmjrock_tablegrid_body_division"> 
+            <table class="tmjrock_tablegrid_body" id="dataTable">
+                <tr id="someRow"> 
+                    <td>S.no</td> <td>Roll number</td> <td>Name</td> <td>Mother</td> <td>Father</td>
+                </tr>
+                <tr > 
+                    <td>S.no</td> <td>Roll number</td> <td>Name</td> <td>Mother</td> <td>Father</td>
+                </tr>
+            </table>
+
+        </div>
+        <div class="tmjrock_tmgrid_pagination_division"> 
+            <table class="tmjrock_tmgrid_pagination" id="dataTablePagination">
+                <tr><td>some pagination</td></tr>
+            </table>
+
+        </div>
+
+
+    </div>
+
+
+</body>
+
+
+</html>

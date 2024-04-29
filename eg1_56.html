@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang='en'>
+<head>
+<meta charset='utf-8'>
+<title>TMJRock AJAX json Example</title>
+<script>
+
+// this will finally be part of TMJRock javascript Library
+var $$$={
+    ajax(json)    
+    {
+        var xmlHttpRequest=new XMLHttpRequest();
+        xmlHttpRequest.onreadystatechange=function(){
+            if(this.readyState==4)
+            {
+                if(this.status==200)
+                {
+                    var responseData=this.responseText;
+                    json.success(responseData);
+
+                }
+                else{
+                    json.failure();
+                }
+
+            }
+
+        };
+
+        xmlHttpRequest.open(json.methodType,json.url,true);
+        xmlHttpRequest.send();
+
+    },
+
+
+
+
+
+};
+//TMJRock javascript part ends here
+
+function populateDesignations()
+{
+    $$$.ajax({
+        "url":"servletOne",
+        "methodType":"GET",
+        "success":function(responseData){
+            alert(responseData);
+            var designations=JSON.parse(responseData);
+            alert(designations);
+
+            var designationsComboBox=document.getElementById('designations');
+            var obj;
+            for(var i=0; i<designations.length; i=i+2)
+            {
+            obj=document.createElement('option');
+            obj.value=designations[i].code;
+            obj.text=designations[i].title;
+            designationsComboBox.appendChild(obj);
+            }
+        },
+        "failure":function(){
+            alert("some problem");
+        },
+    });
+
+}
+window.addEventListener('load',populateDesignations);
+
+</script>
+</head>
+
+<body>
+<h1>GET type reqeust Example</h1>
+<select id='designations' >
+</select>
+<br>
+<a href='index.html'>Home</a>
+</body>
+
+</html>

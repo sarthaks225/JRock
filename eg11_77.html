@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang='en'>
+<head>
+<meta charset='utf-8'>
+<title>accordion and modal TMJRock library</title>
+</head>
+<!-- accordion and modal TMJRock library code-->
+<style>
+    .tmjrock_modalMask{
+        width:100%;
+        height:100%;
+        position: fixed;
+        top:0;
+        left:0;
+        border: 2px solid red;
+        background: gray;
+        opacity:65%;
+    }
+    .tmjrock_modal{
+        width:400px;
+        min-width: 400px;
+        height: 300px;
+        min-height: 300px;
+        position: fixed;
+        top:0;
+        bottom:0;
+        right:0;
+        left:0;
+        margin:auto;
+        background: blue;
+        border: 4px solid white;
+        /*overflow:auto;*/
+    }
+    .tmjrock_closeButton{
+        position: absolute;
+        top: -35px; 
+        right: -2px;
+        padding-top: 2px;
+        padding-bottom: 2px;
+        padding-right:4px;
+        padding-left:2px;
+        font-size: 20px;
+        background-color: red;
+        cursor: pointer;
+    }
+
+</style>
+
+
+<script>
+    var $$$={};
+
+    $$$.model = {
+        "onStartup": [],
+        "accordions": [],
+        "modals":[]
+    };
+
+    $$$.modal={};
+    // accordion pane script part for TMJRock part starts here
+    $$$.toAccordion=function(accordion){
+        
+        let children=accordion.childNodes;
+        alert("accordian called for "+accordion.nodeName);
+
+        let panels=[];
+        let x=0;
+        while(x<children.length){
+            //alert(children[x].nodeName);
+            if(children[x].nodeName=="H3") panels[panels.length]=children[x];
+            if(children[x].nodeName=="DIV") panels[panels.length]=children[x];
+            ++x;
+        }
+        if(panels.length%2!=0) throw "headings and division malformed to create accordion";
+        for(let x=0; x<panels.length; x+=2){
+            if(panels[x].nodeName!="H3") throw "headings and division malformed to create accordion";
+            if(panels[x+1].nodeName!="DIV") throw "headings and division malformed to create accordion";
+        }
+        
+        function onClickAccordionHandler(accordionIndex,x)
+        {
+            return function(){
+                onClickAccordionHandlerFunctionality(accordionIndex,x);
+            };
+        };
+        
+        function onClickAccordionHandlerFunctionality(accordionIndex,panelIndex){
+            if($$$.model.accordions[accordionIndex].displaying !=- 1){
+                $$$.model.accordions[accordionIndex].panels[$$$.model.accordions[accordionIndex].displaying+1].style.display='none';
+            }
+            $$$.model.accordions[accordionIndex].displaying=panelIndex;
+            $$$.model.accordions[accordionIndex].panels[panelIndex+1].style.display=$$$.model.accordions[accordionIndex].panels[panelIndex+1].oldDisplay;
+        
+        }
+
+        for(let x=0; x<panels.length; x+=2)
+        {
+            panels[x].onclick=onClickAccordionHandler($$$.model.accordions.length ,x);
+            panels[x+1].oldDisplay=panels[x+1].style.display;
+            panels[x+1].style.display="none";
+        }
+
+        $$$.model.accordions[$$$.model.accordions.length]={
+            "panels":panels,
+            "displaying":-1
+        };
+
+
+    };
+
+
+    $$$.onDocumentLoaded=function(func){
+        if(typeof func != "function") throw "onDocumentLoaded requires function type argument when call is placed. '"+typeof func+"' not valid";
+        $$$.model.onStartup[$$$.model.onStartup.length]=func;
+    };
+
+    // accordion pane TMJRock script ends here
+
+    // modal TMJRock script part starts here
+
+    $$$.modal.show=function(mid){
+        for(let i=0; i<$$$.model.modals.length; ++i){
+            if($$$.model.modals[i].getContentId()==mid){
+                $$$.model.modals[i].show();
+            }
+        }
+    };
+
+    function Modal(modalElement){
+        this.beforeClosing=null;
+        this.afterClosing=null;
+        this.beforeOpening=null;
+        this.afterOpening=null;
+        var objectAddress=this;
+
+        var contentReference=modalElement;
+        
+        this.getContentId=function(){
+            return contentReference.id;
+        }
+        contentReference.style.display='block';
+        
+        
+        var modalMaskDivison=document.createElement("div");
+        modalMaskDivison.classList.add("tmjrock_modalMask");
+
+        var modalDivision=document.createElement("div");
+        modalDivision.classList.add("tmjrock_modal");
+
+        document.body.appendChild(modalMaskDivison);
+        modalMaskDivison.style.display='none';
+        document.body.appendChild(modalDivision);
+        modalDivision.style.display='none';
+
+        var closeButtonSpan=document.createElement("span");
+        closeButtonSpan.classList.add("tmjrock_closeButton");
+        closeButtonSpan.appendChild(document.createTextNode("X"));
+        
+
+        contentReference.remove();
+        //modalDivision.append(contentReference);
+        var headerDivision=null;
+        var footerDivision=null;
+        let contentDivisionWidth=null;
+        let contentDivisionHeight=null;
+        if(contentReference.hasAttribute("size"))
+        {
+            //alert("size got : "+contentReference.getAttribute("size"));
+            var size=contentReference.getAttribute('size');
+            let xpos=size.indexOf('x');
+            if(xpos==-1) xpos=size.indexOf('X');
+            if(xpos==-1) throw "In case modal size attribute should be specified as widthXheight";
+            if(xpos==0 || xpos==(size.length-1)) throw "In case modal size attribute should be specified as widthXheight";
+            contentDivisionWidth=parseFloat( size.substring(0,xpos) );
+            contentDivisionHeight=parseFloat( size.substring(xpos+1,size.length) );
+
+            if( contentDivisionWidth < 400 ) contentDivisionWidth=400;
+            if( contentDivisionHeight < 300) contentDivisionHeight=300;
+        }
+
+        if(contentReference.hasAttribute("header")){
+            headerDivision=document.createElement("div");
+            headerDivision.style.background='orange';
+            headerDivision.style.right='0';
+            headerDivision.style.height='40px';
+            headerDivision.style.padding='5px';
+            headerDivision.innerHTML=contentReference.getAttribute("header");
+        }
+        
+        if(contentReference.hasAttribute("footer")){
+            //alert("footer got : "+contentReference.getAttribute("footer"));
+            footerDivision=document.createElement("div");
+            footerDivision.style.background='pink';
+            footerDivision.style.height='40px';
+            footerDivision.style.position='absolute';
+            footerDivision.style.left='0';
+            footerDivision.style.right='0';
+            footerDivision.style.bottom='0';
+            footerDivision.style.padding='5px';
+
+            footerDivision.innerHTML=contentReference.getAttribute("footer");
+        }
+        
+        if(contentReference.hasAttribute("maskColor")){
+            modalMaskDivison.style.background=contentReference.getAttribute('maskColor');
+        }
+        if(contentReference.hasAttribute("modalBackgroundColor")){
+            modalDivision.style.background=contentReference.getAttribute("modalBackgroundColor");
+        }
+
+        if(contentReference.hasAttribute("beforeOpening")){
+            this.beforeOpening=contentReference.getAttribute("beforeOpening");
+        }
+        if(contentReference.hasAttribute("afterOpening")){
+            this.afterOpening=contentReference.getAttribute("afterOpening");
+        }
+        if(contentReference.hasAttribute("beforeClosing")){
+            this.beforeClosing=contentReference.getAttribute("beforeClosing");
+        }
+        if(contentReference.hasAttribute("afterClosing")){
+            this.afterClosing=contentReference.getAttribute("afterClosing");
+        }
+        let closeButton=true;
+        if(contentReference.hasAttribute("closeButton")){
+            if(contentReference.getAttribute("closeButton").toUpperCase()=="FALSE"){
+                closeButton=false;
+            }
+        }
+
+        if(closeButton){
+            closeButtonSpan.onclick=function(){
+                let closeModal=true;
+                if(objectAddress.beforeClosing) closeModal=eval(objectAddress.beforeClosing);
+                if(closeModal){
+                    modalMaskDivison.style.display='none';
+                    modalDivision.style.display='none';
+                    if(objectAddress.afterClosing) setTimeout( function(){ eval(objectAddress.afterClosing); } , 100);
+                }
+            };
+        }
+
+        let modalDivisionWidth=contentDivisionWidth+15;
+        let modalDivisionHeight=contentDivisionHeight+15;
+
+        if(contentReference.hasAttribute("header")){
+            let headerHeight=headerDivision.style.height.substring(0,headerDivision.style.height.length-2);
+            headerHeight=parseFloat(headerHeight)+10;
+            modalDivisionHeight+=headerHeight;
+        }
+        if(contentReference.hasAttribute("footer")){
+            let footerHeight=footerDivision.style.height.substring(0,footerDivision.style.height.length-2);
+            footerHeight=parseFloat(footerHeight)+10;
+            modalDivisionHeight+=footerHeight;
+        }
+        modalDivision.style.width=modalDivisionWidth+"px";
+        modalDivision.style.height=modalDivisionHeight+"px";
+
+        var contentDivision=document.createElement("div");
+        contentDivision.style.border="2px solid black";
+        contentDivision.style.padding='5px';
+        
+        contentDivision.style.position='absolute';
+        contentDivision.style.width=contentDivisionWidth+"px";
+        contentDivision.style.height=contentDivisionHeight+"px";
+        
+        contentDivision.style.left=0;
+        contentDivision.style.right=0;
+        contentDivision.style.overflow='auto';
+        contentDivision.appendChild(contentReference);
+
+        if(closeButton) modalDivision.appendChild(closeButtonSpan);
+        if(headerDivision) modalDivision.appendChild(headerDivision);
+        modalDivision.appendChild(contentDivision);
+        if(footerDivision) modalDivision.appendChild(footerDivision);
+
+        this.show =function(){
+            let openModal=true;
+            if(this.beforeOpening) openModal=eval(this.beforeOpening);
+            if(openModal){
+                modalMaskDivison.style.display='block';
+                modalDivision.style.display='block';
+                if(this.afterOpening) setTimeout( function(){ eval(objectAddress.afterOpening);} , 100);
+            }
+        }
+    }
+
+    
+
+    // modal TMJrock script part ends here
+
+    $$$.initializeFramework=function(){
+        let elements=document.getElementsByTagName("*");
+        //alert(elements.length);
+        // initialization of accordion starts here
+        for(let i=0; i<elements.length; ++i) {
+            
+            if(elements[i].hasAttribute("accordion")) //condition for accordion attribute from document element
+            {
+                if(elements[i].getAttribute("accordion")=="true" || elements[i].getAttribute("accordion")=="")
+                {
+                    $$$.onDocumentLoaded(function(){
+                        $$$.toAccordion(elements[i]);
+                    });
+                }
+            }
+        }
+
+        let x=0;
+        for(x=0; x<$$$.model.onStartup.length; ++x){
+            $$$.model.onStartup[x]();
+        }
+        // initialization of accordion ends here
+
+        // initialization of modal starts here
+        for(let i=0; i<elements.length; ++i){
+            if(elements[i].hasAttribute('modal')){
+                if(elements[i].getAttribute('modal').toUpperCase()=="TRUE"){
+                    
+                    elements[i].setAttribute("modal","false");
+                    $$$.model["modals"][$$$.model["modals"].length]=new Modal(elements[i]);
+                    --i; // here we are doing --i because, while creating Modal from class we are removing
+                        //element from Modal(element[i])
+                }
+            }
+        }
+        // initialization of modal ends here
+
+    };
+
+    window.addEventListener('load',function (){ 
+        $$$.initializeFramework() 
+    });
+
+    // TMJRock part ends here
+
+
+    // below script part is written by TMJRock user
+    function abBeforeOpening(){
+        alert("modal is about to be opened");
+        return true;
+    }
+
+    function abOpened(){
+        alert("modal with ab opened");
+    }
+
+    function abBeforeClosing(){
+        alert("modal with ab is about to be closed");
+        return true;
+    }
+    function abClosed(){
+        alert("modal with closed");
+    }
+
+    function createModal1()
+    {
+        $$$.modal.show('ab');
+    }
+
+    function xyz(){
+        var xx=document.getElementById("inputBox");
+        alert(xx);
+    }
+
+
+</script>
+
+<body>
+    <!-- accordion html part starts here -->
+    <div accordion>
+        <h3> Heading 1</h3>
+        <div>
+        1 whatever whatever
+        2 whatever whatever
+        3 whatever whatever
+        4 whatever whatever
+        5 whatever whatever
+        6 whatever whatever
+        7 whatever whatever
+        </div>
+        <h3> Heading 2</h3>
+        <div>
+        11 whatever whatever
+        22 whatever whatever
+        33 whatever whatever
+        44 whatever whatever
+        55 whatever whatever
+        66 whatever whatever
+        77 whatever whatever
+        </div>
+
+        <h3> Heading 3</h3>
+        <div>
+        111 whatever whatever
+        222 whatever whatever
+        333 whatever whatever
+        444 whatever whatever
+        555 whatever whatever
+        666 whatever whatever
+        777 whatever whatever
+        </div>
+
+    </div>
+
+
+    <div accordion>
+        <h3> Heading 111</h3>
+        <div>
+        1 whatever whatever
+        2 whatever whatever
+        3 whatever whatever
+        4 whatever whatever
+        5 whatever whatever
+        6 whatever whatever
+        7 whatever whatever
+        </div>
+        <h3> Heading 222</h3>
+        <div>
+        11 whatever whatever
+        22 whatever whatever
+        33 whatever whatever
+        44 whatever whatever
+        55 whatever whatever
+        66 whatever whatever
+        77 whatever whatever
+        </div>
+
+        <h3> Heading 333</h3>
+        <div>
+        111 whatever whatever
+        222 whatever whatever
+        333 whatever whatever
+        444 whatever whatever
+        555 whatever whatever
+        666 whatever whatever
+        777 whatever whatever
+        </div>
+
+    </div>
+
+
+    
+    <!-- accordion html example part ends here -->
+
+    <button type="button" onclick="createModal1()"> Show first modal</button>
+    <div id="ab" style="display:none" modal="true"  size="100X100"  header="this is header" footer="this is footer"
+    closeButton="true" maskColor="#3355ff" modalBackgroundColor="#549" 
+    beforeOpening="abBeforeOpening()" afterOpening="abOpened()" beforeClosing="abBeforeClosing()" afterClosing="abClosed()">
+        Ram was born in awadh
+        <input id="inputBox" placeholder="input text is here"> </input>
+    </div>
+    <button onclick="xyz()"> xyz</button>
+
+    <!-- modal html example part starts here-->
+    
+    
+    
+
+</body>
+
+
+</html>

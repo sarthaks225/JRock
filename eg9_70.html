@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+    <head> 
+        <meta charset="utf-8">
+        <title> Modal </title>
+        <script>
+                // lecture number 71 me sir ka code
+            function showIt(){
+                let xyzDiv=document.createElement("div");
+                xyzDiv.classList.add('xyz');
+                xyzDiv.id="xyzDiv";
+                document.body.appendChild(xyzDiv);
+
+                let pqrDiv=document.createElement("div");
+                pqrDiv.id="pqrDiv";
+                pqrDiv.classList.add('pqr');
+                let str="";
+                for(let i=0; i<5; ++i)
+                {
+                    str+="Cool <br> Im cool <br> We are cool <br><br>";
+                }
+                
+                pqrDiv.innerHTML=str;
+
+                let lmnSpan=document.createElement("span");
+                lmnSpan.id="lmnSpan";
+                lmnSpan.classList.add('lmn');
+                lmnSpan.appendChild(document.createTextNode ("X"));
+                lmnSpan.onclick=removeModal;
+            
+                pqrDiv.appendChild(lmnSpan);
+                document.body.appendChild(pqrDiv);
+            }
+
+            var removeModal=function(){
+                let xyzDiv=document.getElementById("xyzDiv");
+                xyzDiv.remove();
+                let pqrDiv=document.getElementById("pqrDiv");
+                pqrDiv.remove();
+            }
+
+        </script>
+        <style>
+            .xyz{
+                width:100%;
+                height:100%;
+                position: fixed;
+                top:0;
+                left:0;
+                border: 2px solid red;
+                background: gray;
+                opacity:65%;
+            }
+            .pqr{
+                width:400px;
+                min-width: 400px;
+                height: 300px;
+                min-height: 300px;
+                position: fixed;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                margin:auto;
+                background: blue;
+                border: 4px solid white;
+                overflow:auto;
+            }
+            .lmn{
+                top: 115px; /* Adjust top position as needed */
+                right: 480px; /* Adjust right position as needed */
+                padding-top: 5px;
+                padding-bottom: 5px;
+                padding-right:5px;
+                padding-left:5px;
+                position:fixed;
+                background-color: red;
+                cursor:pointer;
+                
+            }
+
+        </style>
+
+    </head>
+    <body>
+        <button type='button'  onclick="showIt()"> Show it</button>
+    
+    </body>
+    </html>

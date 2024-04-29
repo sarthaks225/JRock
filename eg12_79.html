@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!--add feature for scrolling in y for table header and table body direction 
+        when hrizontal scroll requuired-->
+<meta charset='utf-8'>
+<title>table grid </title>
+
+<!--  tmjrock specific styling -->
+<style> 
+
+.tmjrock_tablegrid_header_division{
+    overflow-x:hidden ;
+    overflow-y: hidden ;
+}
+
+.tmjrock_tablegrid_head{
+    margin: 4px;
+    margin-bottom:0px;
+    
+    border-bottom:0px;
+    border-spacing: 0px;
+    border-collapse: collapse;
+    background: bisque;
+}
+.tmjrock_tablegrid_head td{
+    border:1px groove blue;
+    border-bottom: 0px;
+    width: 50px;
+    text-align: right;
+    
+}
+.tmjrock_tablegrid_head td+td{
+    width: 100px;
+    text-align: left;
+}
+.tmjrock_tablegrid_head td+td+td{
+    width: 150px;
+    text-align: left;
+}
+
+
+.tmjrock_tablegrid_body_division{
+    overflow-x: auto;
+    overflow-y: auto ;
+    width:340px;
+    height: 400px;
+
+}
+
+.tmjrock_tablegrid_body{
+    margin: 4px;
+    margin-top:0px;
+
+    border-spacing: 0px;
+    border-collapse: collapse;
+    
+}
+
+.tmjrock_tablegrid_body td{
+    border: 1px groove red;
+    width: 50px;
+    text-align: right;
+}
+
+.tmjrock_tablegrid_body td+td{
+    width: 100px;
+    text-align: left;
+    
+}
+.tmjrock_tablegrid_body td+td+td{
+    width: 150px;
+    text-align: left;
+}
+
+</style>
+
+<!--user specific styling -->
+<style>
+    .somestyle{
+        border: 1px solid black;
+        width:900px;
+        height:600px;
+    }
+    </style>
+
+</head>
+<body>
+    <div class="somestyle"> 
+        <div class="tmjrock_tablegrid_header_division">
+            <table class="tmjrock_tablegrid_head">
+                <tr> <td>S.no </td> <td>Name </td> <td>City </td></tr>
+            </table>
+
+        </div>
+        <div class="tmjrock_tablegrid_body_division"> 
+            <table class="tmjrock_tablegrid_body">
+                <tr> 
+                    <td> 1.</td> <td> sameer joshi </td> <td> Manawar</td>
+                </tr>
+                <tr> 
+                    <td> 1.</td> <td> sameer joshi </td> <td> Manawar</td>
+                </tr>
+                <tr> 
+                    <td> 1.</td> <td> sameer joshi </td> <td> Manawar</td>
+                </tr>
+                <tr> 
+                    <td> 1.</td> <td> sameer joshi </td> <td> Manawar</td>
+                </tr>
+                <tr> 
+                    <td> 1.</td> <td> sameer joshi </td> <td> Manawar</td>
+                </tr>
+                <tr> 
+                    <td> 1.</td> <td> sameer joshi </td> <td> Manawar</td>
+                </tr>
+                <tr> 
+                    <td> 1.</td> <td> sameer joshi </td> <td> Manawar</td>
+                </tr>
+                <tr> 
+                    <td> 1.</td> <td> sameer joshi </td> <td> Manawar</td>
+                </tr>
+                <tr> 
+                    <td> 1.</td> <td> sameer joshi </td> <td> Manawar</td>
+                </tr>
+                <tr> 
+                    <td> 1.</td> <td> sameer joshi </td> <td> Manawar</td>
+                </tr>
+                <tr> 
+                    <td> 1.</td> <td> sameer joshi </td> <td> Manawar</td>
+                </tr>
+                <tr> 
+                    <td> 1.</td> <td> sameer joshi </td> <td> Manawar</td>
+                </tr>
+                <tr> 
+                    <td> 1.</td> <td> sameer joshi </td> <td> Manawar</td>
+                </tr>
+                <tr> 
+                    <td> 1.</td> <td> sameer joshi </td> <td> Manawar</td>
+                </tr>
+                <tr> 
+                    <td> 1.</td> <td> sameer joshi </td> <td> Manawar</td>
+                </tr>
+                <tr> 
+                    <td> 1.</td> <td> sameer joshi </td> <td> Manawar</td>
+                </tr>
+                <tr> 
+                    <td> 1.</td> <td> sameer joshi </td> <td> Manawar</td>
+                </tr>
+                <tr> 
+                    <td> 1.</td> <td> sameer joshi </td> <td> Manawar</td>
+                </tr>
+                <tr> 
+                    <td> 1.</td> <td> sameer joshi </td> <td> Manawar</td>
+                </tr>
+                <tr> 
+                    <td> 1.</td> <td> sameer joshi </td> <td> Manawar</td>
+                </tr>
+                <tr> 
+                    <td> 1.</td> <td> sameer joshi </td> <td> Manawar</td>
+                </tr>
+                <tr> 
+                    <td> 1.</td> <td> sameer joshi </td> <td> Manawar</td>
+                </tr>
+                <tr> 
+                    <td> 1.</td> <td> sameer joshi </td> <td> Manawar</td>
+                </tr>
+                <tr> 
+                    <td> 1.</td> <td> sameer joshi </td> <td> Manawar</td>
+                </tr>
+
+                <tr> 
+                    <td> 10000.</td> <td> some name </td> <td> some city</td>
+                </tr>
+
+
+            </table>
+
+        </div>
+
+    </div>
+</body>
+
+</html>

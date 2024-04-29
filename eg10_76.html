@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+    <head> 
+        <meta charset="utf-8">
+        <title> Modal </title>
+        <style>
+            .modalMask{
+                width:100%;
+                height:100%;
+                position: fixed;
+                top:0;
+                left:0;
+                border: 2px solid red;
+                background: gray;
+                opacity:65%;
+            }
+            .modal{
+                width:400px;
+                min-width: 400px;
+                height: 300px;
+                min-height: 300px;
+                position: fixed;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                margin:auto;
+                background: blue;
+                border: 4px solid white;
+                /*overflow:auto;*/
+            }
+            .closeButton{
+                position: absolute;
+                top: -35px; 
+                right: -2px;
+                padding-top: 2px;
+                padding-bottom: 2px;
+                padding-right:4px;
+                padding-left:2px;
+                font-size: 20px;
+                background-color: red;
+                cursor: pointer;
+            }
+
+        </style>
+        <script>
+            var ds={
+                "modals":[]
+            };
+            /*
+            var $$$={};
+            $$$.modal={};
+            */
+           var $$$={
+            "modal":{}
+           }
+            $$$.modal.show=function(mid){
+                for(let i=0; i<ds.modals.length; ++i){
+                    if(ds.modals[i].getContentId()==mid){
+                        ds.modals[i].show();
+                    }
+                }
+            };
+
+            function $$$(mid){
+                for(let i=0; i<ds['modals'].length; ++i){
+                    if(ds["modals"][i].getContentId()==mid){
+                        ds["modals"][i].show();
+                    }
+                }
+            }
+
+            function Modal(modalElement){
+                this.onClose=null;
+                this.onOpen=null;
+                var objectAddress=this;
+
+                var contentReference=modalElement;
+                
+                this.getContentId=function(){
+                    return contentReference.id;
+                }
+                
+                var modalMaskDivison=document.createElement("div");
+                modalMaskDivison.classList.add("modalMask");
+
+                var modalDivision=document.createElement("div");
+                modalDivision.classList.add("modal");
+
+                var closeButtonSpan=document.createElement("span");
+                closeButtonSpan.classList.add("closeButton");
+                closeButtonSpan.appendChild(document.createTextNode("X"));
+               
+
+                contentReference.remove();
+                //modalDivision.append(contentReference);
+                var headerDivision=null;
+                var footerDivision=null;
+                if(contentReference.hasAttribute("header")){
+                    headerDivision=document.createElement("div");
+                    headerDivision.style.background='orange';
+                    headerDivision.style.right='0';
+                    headerDivision.style.height='40px';
+                    headerDivision.style.padding='5px';
+                    headerDivision.innerHTML=contentReference.getAttribute("header");
+                }
+                if(contentReference.hasAttribute("size"))
+                {
+                    //alert("size got : "+contentReference.getAttribute("size"));
+                    var size=contentReference.getAttribute('size');
+                    let xpos=size.indexOf('x');
+                    if(xpos==-1) xpos=size.indexOf('X');
+                    if(xpos==-1) throw "In case modal size attribute should be specified as widthXheight";
+                    if(xpos==0 || xpos==(size.length-1)) throw "In case modal size attribute should be specified as widthXheight";
+                    let width=size.substring(0,xpos);
+                    let height=size.substring(xpos+1,size.length);
+                    modalDivision.style.width=width+"px";
+                    modalDivision.style.height=height+"px";
+                }
+                
+                if(contentReference.hasAttribute("footer")){
+                    //alert("footer got : "+contentReference.getAttribute("footer"));
+                    footerDivision=document.createElement("div");
+                    footerDivision.style.background='pink';
+                    footerDivision.style.height='40px';
+                    footerDivision.style.position='absolute';
+                    footerDivision.style.left='0';
+                    footerDivision.style.right='0';
+                    footerDivision.style.bottom='0';
+                    footerDivision.style.padding='5px';
+
+                    footerDivision.innerHTML=contentReference.getAttribute("footer");
+                }
+                
+                if(contentReference.hasAttribute("maskColor")){
+                    modalMaskDivison.style.background=contentReference.getAttribute('maskColor');
+                }
+                if(contentReference.hasAttribute("modalBackgroundColor")){
+                    modalDivision.style.background=contentReference.getAttribute("modalBackgroundColor");
+                }
+                if(contentReference.hasAttribute("onOpen")){
+                    this.onOpen=contentReference.getAttribute("onOpen");
+                }
+                if(contentReference.hasAttribute("onClose")){
+                    this.onClose=contentReference.getAttribute("onClose");
+                }
+                let closeButton=true;
+                if(contentReference.hasAttribute("closeButton")){
+                    if(contentReference.getAttribute("closeButton").toUpperCase()=="FALSE"){
+                        closeButton=false;
+                    }
+                }
+
+                if(closeButton){
+                    closeButtonSpan.onclick=function(){
+                        modalMaskDivison.remove();
+                        modalDivision.remove();
+                        if(objectAddress.onClose) setTimeout( function(){ eval(objectAddress.onClose); } , 100);
+                    };
+                }
+
+                var contentDivision=document.createElement("div");
+                contentDivision.style.border="2px solid black";
+                contentDivision.style.padding='5px';
+                
+                contentDivision.style.position='absolute';
+
+                if(contentReference.hasAttribute("header")){
+                    let headerHeight=headerDivision.style.height.substring(0,headerDivision.style.height.length-2);
+                    headerHeight=parseFloat(headerHeight)+10;
+                    contentDivision.style.top=headerHeight+"px";
+                }
+                else contentDivision.style.top=0;
+
+                if(contentReference.hasAttribute("footer")){
+                    let footerHeight=footerDivision.style.height.substring(0,footerDivision.style.height.length-2);
+                    footerHeight=parseFloat(footerHeight)+10;
+                    contentDivision.style.bottom=footerHeight+"px";
+                }
+                else contentDivision.style.bottom=0;
+                
+                contentDivision.style.left=0;
+                contentDivision.style.right=0;
+                contentDivision.style.overflow='auto';
+                contentDivision.appendChild(contentReference);
+
+                if(closeButton) modalDivision.appendChild(closeButtonSpan);
+                if(headerDivision) modalDivision.appendChild(headerDivision);
+                modalDivision.appendChild(contentDivision);
+                if(footerDivision) modalDivision.appendChild(footerDivision);
+
+                this.show =function(){
+                    document.body.appendChild(modalMaskDivison);
+                    document.body.appendChild(modalDivision);
+                    if(this.onOpen) setTimeout( function(){ eval(objectAddress.onOpen);} , 100);
+                }
+            }
+
+            function loader(){
+                setTimeout(function(){
+                    document.body.style.visibility ='visible';
+                } , 100);
+
+                var elements=document.getElementsByTagName("*");
+                for(let i=0; i<elements.length; ++i){
+                    if(elements[i].hasAttribute('modal')){
+                        if(elements[i].getAttribute('modal').toUpperCase()=="TRUE"){
+                            ds["modals"][ds["modals"].length]=new Modal(elements[i]);
+                            --i; // here we are doing --i because, while creating Modal from class we are removing
+                                //element from Modal(element[i])
+                        }
+                    }
+                }
+            }
+            window.addEventListener('load',loader);
+
+
+            function abOpened(){
+                alert("ab opened");
+            }
+            function abClosed(){
+                alert("ab closed");
+            }
+
+            function createModal1()
+            {
+                $$$.modal.show('ab');
+                //$$$('ab').show();
+                /*
+                $$$('ab').onOpen=function(){
+                    alert("modal with ab onOpen invoked");
+                };
+                $$$('ab').onClose=function(){
+                    alert("modal with ab onClose invoked");
+                };
+                */
+            }
+
+            function createModal2()
+            {
+                // probmlem in $$$('pq')
+                $$$('pq').show();
+                $$$('pq').onOpen=function(){
+                    alert("modal pq opened");
+                };
+                $$$('pq').onClose=function(){
+                    alert("modal pq closed");
+                };
+
+            }
+
+        </script>
+        
+
+    </head>
+    <body style="visibility: hidden;">
+        <!--
+            we can alse write these hidden functionality as 
+        <style>
+            
+            body {
+                visibility: hidden; /* Initially hide the body */
+            }
+        </style>
+        -->
+        
+        <button type="button" onclick="createModal1()"> Show first modal</button>
+        <button type="button" onclick="createModal2()"> Show second modal</button>
+        <div id="ab" modal="true"  size="800X400"  header="this is header" footer="this is footer"
+        closeButton="true" maskColor="#3355ff" modalBackgroundColor="#549" onOpen="abOpened()" onClose="abClosed()">
+            God is great<br>
+            God is great God is great God is great God is great God is greatis great God is great God is great<br>
+            God is great<br><br>
+            God is great<br>
+            God is great God is great God is great God is great God is great God is great God is great God is great God is great<br>
+            <p>Ram was born in Ayodhya
+                 Ram was born in Ayodhya Ram was born in 
+                Ayodhya Ram was born in AyodhyaRam was born in AyodhyaRam was born in Ayodhya Ram was born in Ayodhya</p>
+                <textarea rows="4" cols="50" style="background-color:beige;" placeholder="Background Text"></textarea>
+            God is great<br><br>
+            God is great<br>
+            God is great God is great God is great God is great God is great<br>
+            God is great<br><br>
+            God is great<br>
+            God is great God is great God is great God is great God is great<br>
+            God is great<br><br>
+            God is great<br>
+            God is great God is great God is great God is great God is great<br>
+            God is great<br><br>
+            God is great<br>
+            God is great God is great God is great God is great God is great<br>
+            God is great<br><br>
+        </div>
+        <div id="pq" modal="true">Ujjain is city of gods</div>
+    </body>
+    </html>

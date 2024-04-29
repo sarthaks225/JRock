@@ -1,0 +1,102 @@
+<html lang="en">
+<head>
+<meta charset='utf-8'>
+<title>TMJRock AJAX json Example</title>
+</head>
+<script>
+//TMJRock part starts here
+function $$$(action){
+    if(action=="someForm")
+    {
+        return {
+            isValid: function (declaration){
+
+            }
+
+        }
+
+    }
+
+}
+
+//TMJRock part ends here
+
+//TMJRock user script starts here
+
+function doSomething()
+{
+    return $$$("someForm").isValid({
+        "name":{
+            "required":true,
+            "max-length":20,
+            "error-panel":"nameErrorSection",
+            "errors":{
+                "required":"Name required",
+                "max-length":"Name can not exceed 20 characters"
+            }
+        },
+        "address":{
+            "required":true,
+            "error-panel":"addressErrorSection",
+            "errors":{
+                "required":"Address required"
+            }
+        },
+        "city":{
+            "invalid":-1,
+            "error-panel":"cityErrorSection",
+            "errors":{
+                "invalid":"Select city"
+            }
+        },
+        "gender":{
+            "required":true,
+            "error-panel":"genderErrorSection",
+            "errors":{
+                "required":"Select gender"
+            }
+        },
+        
+        "agree":{
+            "required":true,
+            "error-panel":"agreeErrorSection",
+            "errors":{
+                "required":"Select I agree checkbox"
+            }
+        }
+
+    });
+}
+
+
+
+//TMJRock user script ends here
+
+</script>
+
+<body>
+<h1>TMJRock validations</h1>
+<form id='something' action='whaterver' onsubmit='return doSomething' >
+    Name &nbsp;<input type='text' name='name' id='name'> </input>
+    &nbsp; <span id="nameErrorSection"></span> <br><br>
+    Address &nbsp; <input type='textArea' name='address' id='address'> </textArea>
+    &nbsp; <span id="addressErrorSection"></span> <br><br>
+    select city &nbsp; 
+    <select name='city' id="city" >
+        <option value="-1">Select city </option>
+        <option value="1">Manawar</option>
+        <option value="2">Ujjain</option>
+        <option value="3">Indore</option>
+    </select>
+    &nbsp; <span id="cityErrorSection"> </span> <br>
+    Gender &nbsp; &nbsp; &nbsp; 
+    Male <input type='radio' name='gender' id="male" value="M"> </input>
+    &nbsp; &nbsp; Female <input type="radio" name="gender" id="female" value="F"> </input>
+    &nbsp; <span id="genderErrorSection"></span> <br>
+    I Agree &nbsp<input type="checkbox" name="agree" id="agree" value="Y"></input>
+    &nbsp<span id="agreeErrorSection"> </span> <br>
+    <button type="submit"> Register </button>
+</form>
+
+</body>
+</html>

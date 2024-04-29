@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang='en'>
+<head>
+<meta charset='utf-8'>
+<title>AJAX Example </title>
+<script>
+
+$$$.ajax=function(jsonObject){
+    if(!jsonObject["url"]) throw "url property is missing in call to ajax";
+    let url=jsonObject["url"];
+    if(typeof url!="string") throw "url property should be of type string in call to ajax"
+    let methodType="GET";
+    if(jsonObject["methodType"])
+    {
+        methodType=jsonObject["methodType"];
+        methodType.toUpperCase();
+        if(["GET","POST"].includes(methodType)==false) throw "methodType property should be only GET or POST in call to ajax";
+    }
+    let onSuccess=null;
+    if(jsonObject["success"])
+    {
+        onSuccess=jsonObject["success"];
+        if(typeof onSuccess!="function") throw "success should be function in call to ajax"
+    }
+    let onFailure=null;
+    if(jsonObject["failure"])
+    {
+        onFailure=jsonObject["failure"];
+        if(typeof onFailure!="function") throw "faulure should be function in call to ajax";
+    }
+    alert(methodType);
+    if(methodType=="GET")
+    {
+        var xmlHttpRequest=new XMLHttpRequest();
+        xmlHttpRequest.onreadystatechange=function (){
+            if(this.readyState==4){
+                if(this.status==200)
+                {
+                    var responseData=this.responseText;
+                    if(onSuccess) onSuccess(responseData);
+                }
+                else{
+                    onFailure();
+                }
+
+            }
+        }
+        
+        // we will change the below code to traverse the jsonData
+
+        // this traversal part for data was assignment in lecture 64 discussed in lecture 64
+        if(jsonObject['data'])
+        {
+            let data=jsonObject['data'];
+            let queryString='?';
+            for(let key in data)
+            {
+                queryString += encodeURI( key+'='+data[key] );
+                queryString+='&';
+            }
+
+            url+=queryString.substring(0,queryString.length-1);
+        }
+
+        alert("generated query string url : "+url);
+        xmlHttpRequest.open(methodType,url,true);
+        xmlHttpRequest.send();
+
+    }
+    else if(methodType=="POST")
+    {
+        
+        var xmlHttpRequest=new XMLHttpRequest();
+        xmlHttpRequest.onreadystatechange=function (){
+            if(this.readyState==4){
+                if(this.status==200){
+                    var responseData=this.responseText;
+                    if(onSuccess) onSuccess(responseData);                
+                }
+                else{
+                    if(onFailure) onFailure();
+                }
+            }
+        };
+
+        let sendJSON=true;
+        let jsonData={};
+        let queryString="";
+        if(jsonObject['data'])
+        {
+            if(jsonObject["sendJSON"]!=null)
+            {
+                if(typeof jsonObject["sendJSON"]!="boolean") throw "sendJSON should be of boolean in call to ajax";
+                sendJSON=jsonObject["sendJSON"];
+            }
+
+            jsonData=jsonObject['data'];
+            if(sendJSON==false)
+            {
+                for(let k in jsonData){
+                    queryString+=encodeURI(k);
+                    queryString+="=";
+                    queryString+=encodeURI(jsonData[k]);
+                    queryString+="&";
+                }
+                queryString=queryString.substring(0,queryString.length-1);
+                alert(queryString);
+            }
+        }
+
+        xmlHttpRequest.open(methodType,url,true);
+        if(sendJSON==true)
+        {
+            xmlHttpRequest.setRequestHeader("Content-Type","application/json");
+            xmlHttpRequest.send(JSON.stringify(jsonData));
+        }
+        else
+        {
+            xmlHttpRequest.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+            xmlHttpRequest.send(queryString);
+        }
+
+    }
+}
+
+function $$$(elementId)
+{
+    let element=document.getElementById(elementId);
+    if(!element) throw "Invalid elementId : "+elementId;
+    return new TMJRockElement(element);
+}
+function TMJRockElement(element)
+{
+    this.element=element;
+    this.innerHTML=function(content)
+    {
+        if(typeof this.element.innerHTML=='string')
+        {
+            if(typeof content=="string")
+            {
+                this.element.innerHTML=content;
+            }
+            return this.element.innerHTML;
+        }
+        return NULL;
+    }
+
+    this.value=function(content)
+    {
+        if(typeof this.element.value=="string")
+        {
+            if(typeof content=="string")
+            {
+                this.element.value=content;
+            }
+            return this.element.value;
+        }
+        return NULL;
+    }
+
+}
+
+
+
+
+function saveEnquiry()
+{
+var firstName=$$$("firstName").value();
+var lastName=$$$("lastName").value();
+var age=$$$("age").value();
+
+alert(firstName+","+lastName+","+age);
+
+var whatever=$$$("whatever");
+whatever.innerHTML("");
+
+var customer={
+"firstName":firstName,
+"lastName":lastName,
+"age":age
+}
+
+$$$.ajax({
+    "url":"servletThree",
+    "methodType":"POST",
+    "data":customer,
+    "sendJSON":true,
+    "success":function(responseData){
+        alert(responseData);
+        var customer=JSON.parse(responseData);
+
+        var a="";
+        a+="First Name :"+customer.firstName;
+        a+=" Last Name :"+customer.lastName;
+        a+=" age : "+customer.age;
+        whatever.innerHTML(a);
+
+    },
+    "faulure":function(){
+        alert("some problem");
+    }
+
+
+});
+
+/*
+var xmlHttpRequest=new XMLHttpRequest();
+
+xmlHttpRequest.onreadystatechange=function(){
+if(this.readyState==4)
+{
+if(this.status==200)
+{
+var customer=JSON.parse(this.responseText);
+var a="First Name :"+customer.firstName+"<br>";
+a=a+"Last Name :"+customer.lastName+"<br>";
+a=a+"Age :"+customer.age+"<br>";
+whatever.innerHTML=a;
+}else
+{
+alert("some error");
+}
+
+}
+};
+xmlHttpRequest.open("POST","servletThree",true);
+xmlHttpRequest.setRequestHeader("Content-Type","application/json");
+
+xmlHttpRequest.send(JSON.stringify(customer));
+*/
+}
+
+</script>
+</head>
+<body>
+<h1>Post type request</h1>
+First name <input type='text' id='firstName'> <br>
+Last name <input type='text' id='lastName'> <br>
+Age <input type='text' id='age'> <br>
+<button type='submit' onclick='saveEnquiry()'>Save</button>
+<div id='whatever'></div><br>
+<a href='index.html'>Home</a>
+</body>
+
+</html>
+	

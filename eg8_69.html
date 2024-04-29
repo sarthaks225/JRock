@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang='en'>
+<head>
+<meta charset='utf-8'>
+<title> Ajax examples</title>
+</head>
+
+<script>
+
+    function doSomething(){
+        let tb=document.getElementById("tb");
+        let positionA=document.getElementById("positionA");
+        tb.remove();
+        positionA.appendChild(tb);
+    }
+
+    function putItBack(){
+        let tbDiv=document.getElementById("tbDiv");
+        let tb=document.getElementById("tb");
+        tb.remove();
+        tbDiv.appendChild(tb);
+
+    }
+</script>
+
+<body>
+<button type="button" onclick="doSomething()"> Change Position</button>
+<button type="button" onclick="putItBack()"> Put it back </button>
+
+<div>
+    <h1></h1>
+    <span id="positionA" > </span>
+    <br><br>
+    God is great<br>
+    Ujjain is city of Gods<br><br>
+    <div id="tbDiv"> 
+        <table border="1" id="tb"> <tr> <td>God is</td> <td>Great </td></tr></table>
+    </div>
+<div>
+
+
+</body>
+
+</html>

@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+    <head> 
+        <meta charset="utf-8">
+        <title> Modal </title>
+        <style>
+            .modalMask{
+                width:100%;
+                height:100%;
+                position: fixed;
+                top:0;
+                left:0;
+                border: 2px solid red;
+                background: gray;
+                opacity:65%;
+            }
+            .modal{
+                width:400px;
+                min-width: 400px;
+                height: 300px;
+                min-height: 300px;
+                position: fixed;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                margin:auto;
+                background: blue;
+                border: 4px solid white;
+                overflow:auto;
+            }
+            .closeButton{
+                top: 115px; /* Adjust top position as needed */
+                right: 480px; /* Adjust right position as needed */
+                padding-top: 5px;
+                padding-bottom: 5px;
+                padding-right:5px;
+                padding-left:5px;
+                position:fixed;
+                background-color: red;
+                cursor:pointer;
+            }
+
+        </style>
+        <script>
+            var ds={
+                "modals":[]
+            };
+            function $$$(mid){
+                for(let i=0; i<ds['modals'].length; ++i){
+                    if(ds["modals"][i].getContentId()==mid){
+                        return ds["modals"][i];
+                    }
+                }
+            }
+
+            function Modal(modalElement){
+                this.onClose=null;
+                this.onOpen=null;
+                var objectAddress=this;
+
+                var contentReference=modalElement;
+                
+                this.getContentId=function(){
+                    return contentReference.id;
+                }
+                
+                var modalMaskDivison=document.createElement("div");
+                modalMaskDivison.classList.add("modalMask");
+
+                var modalDivision=document.createElement("div");
+                modalDivision.classList.add("modal");
+
+                var closeButtonSpan=document.createElement("span");
+                closeButtonSpan.classList.add("closeButton");
+                closeButtonSpan.appendChild(document.createTextNode("X"));
+                modalDivision.appendChild(closeButtonSpan);
+                contentReference.remove();
+                modalDivision.append(contentReference);
+                
+                closeButtonSpan.onclick=function(){
+                    modalMaskDivison.remove();
+                    modalDivision.remove();
+                    if(objectAddress.onClose) objectAddress.onClose();
+                };
+
+                this.show =function(){
+                    document.body.appendChild(modalMaskDivison);
+                    document.body.appendChild(modalDivision);
+                    if(this.onOpen) this.onOpen();
+                }
+            }
+
+            function loader(){
+                var elements=document.getElementsByTagName("*");
+                for(let i=0; i<elements.length; ++i){
+                    if(elements[i].hasAttribute('modal')){
+                        if(elements[i].getAttribute('modal').toUpperCase()='TRUE'){
+                            ds["modals"][ds["modals"].length]=new Modal(elements[i]);
+                            --i; // here we are doing --i because, while creating Modal from class we are removing
+                                //element from Modal(element[i])
+                        }
+                    }
+                }
+            }
+            window.addEventListener('load',loader);
+
+
+            
+
+            function createModal1()
+            {
+                $$$('ab').show();
+                $$$('ab').onOpen=function(){
+                    alert("modal with ab onOpen invoked");
+                };
+                $$$('ab').onClose=function(){
+                    alert("modal with ab onClose invoked");
+                };
+            }
+
+            function createModal2()
+            {
+                $$$('pq').show();
+            }
+
+        </script>
+        
+
+    </head>
+    <body>
+        <button type="button" onclick="createModal1()"> Show first modal</button>
+        <button type="button" onclick="createModal2()"> Show second modal</button>
+        <div id="ab" modal="true">God is great</div>
+        <div id="pq" modal="true">Ujjain is city of gods</div>
+    </body>
+    </html>

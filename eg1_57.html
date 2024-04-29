@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang='en'>
+<head>
+<meta charset='utf-8'>
+<title>TMJRock AJAX json Example</title>
+<script>
+
+// this will finally be part of TMJRock javascript Library
+function $$$(parameter)
+{
+    if(parameter=="designationCode")
+    {
+        return {
+                fillComboBox(declaration) {
+                var designationsComboBox=document.getElementById('designations');
+                var obj;
+                if(declaration.firstOption!=null)
+                {
+                    obj=document.createElement("option");
+                    obj.text=declaration.firstOption.text;
+                    obj.value=declaration.firstOption.value;
+                    designationsComboBox.appendChild(obj);
+                }
+                var dataSource=declaration.dataSource;
+                for(var i=0; i<dataSource.length; i+=1)
+                {
+                    obj=document.createElement('option');
+                    obj.text=dataSource[i][declaration.text];
+
+                    obj.value=dataSource[i][declaration.value];
+                    designationsComboBox.appendChild(obj);
+                }
+            }
+        }
+
+    }
+}
+
+$$$.ajax=function(declaration)    
+{
+    var xmlHttpRequest=new XMLHttpRequest();
+    xmlHttpRequest.onreadystatechange=function(){
+        if(this.readyState==4)
+        {
+            if(this.status==200)
+            {
+                var responseData=this.responseText;
+                declaration.success(responseData);
+
+            }
+            else{
+                declaration.failure();
+            }
+        }
+    };
+
+    xmlHttpRequest.open(declaration.methodType,declaration.url,true);
+    xmlHttpRequest.send();
+}
+//TMJRock javascript part ends here
+
+function populateDesignations()
+{
+    $$$.ajax({
+        "url":"servletOne",
+        "methodType":"GET",
+        "success":function(responseData){
+            alert(responseData);
+            var designations=JSON.parse(responseData);
+            alert(designations);
+            
+            $$$("designationCode").fillComboBox({
+                "dataSource":designations,
+                "text":"title",
+                "value":"code",
+                "firstOption":{
+                    "text":"select designation",
+                    "value":"-1"
+                }
+
+            });
+        },
+        "failure":function(){
+            alert("some problem");
+        },
+    });
+
+}
+window.addEventListener('load',populateDesignations);
+
+</script>
+</head>
+
+<body>
+<h1>GET type reqeust Example</h1>
+<select id='designations' >
+</select>
+<br>
+<a href='index.html'>Home</a>
+<body>
+
+</html>

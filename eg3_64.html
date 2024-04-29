@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang='en'>
+<head>
+<meta charset='utf-8'>
+<title>AJAX Example</title>
+
+<script>
+    $$$.ajax=function(jsonObject){
+
+        if(!jsonObject["url"]) throw "url property is missing in call to ajax";
+        let url=jsonObject["url"];
+        if(typeof url!="string") throw "url property should be of type string in call to ajax"
+        let methodType="GET";
+        if(jsonObject["methodType"])
+        {
+            methodType=jsonObject["methodType"];
+            methodType.toUpperCase();
+            if(["GET","POST"].includes(methodType)==false) throw "methodType property should be only GET or POST in call to ajax";
+        }
+        let onSuccess=null;
+        if(jsonObject["success"])
+        {
+            onSuccess=jsonObject["success"];
+            if(typeof onSuccess!="function") throw "success should be function in call to ajax"
+        }
+        let onFailure=null;
+        if(jsonObject["failure"])
+        {
+            onFailure=jsonObject["failure"];
+            if(typeof onFailure!="function") throw "faulure should be function in call to ajax";
+        }
+        if(methodType=="GET")
+        {
+            var xmlHttpRequest=new XMLHttpRequest();
+            xmlHttpRequest.onreadystatechange=function (){
+                if(this.readyState==4){
+                    if(this.status==200)
+                    {
+                        var responseData=this.responseText;
+                        if(onSuccess) onSuccess(responseData);
+                    }
+                    else{
+                        onFailure();
+                    }
+
+                }
+            }
+            
+            // we will change the below code to traverse the jsonData
+
+            // this traversal part for data was assignment in lecture 64 discussed in lecture 64
+            if(jsonObject['data'])
+            {
+                let data=jsonObject['data'];
+                let queryString='?';
+                for(let key in data)
+                {
+                    queryString += encodeURI( key+'='+data[key] );
+                    queryString+='&';
+                }
+
+                url+=queryString.substring(0,queryString.length-1);
+            }
+
+            alert("generated query string url : "+url);
+            xmlHttpRequest.open(methodType,url,true);
+            xmlHttpRequest.send();
+
+        }
+        else if(methodType=="POST")
+        {
+
+        }
+    }
+
+    function $$$(elementId)
+    {
+        let element=document.getElementById(elementId);
+        if(!element) throw "Invalid elementId : "+elementId;
+        return new TMJRockElement(element);
+    }
+    function TMJRockElement(element)
+    {
+        this.element=element;
+        this.innerHTML=function(content)
+        {
+            if(typeof this.element.innerHTML=='string')
+            {
+                if(typeof content=="string")
+                {
+                    this.element.innerHTML=content;
+                }
+                return this.element.innerHTML;
+            }
+            return NULL;
+        }
+
+        this.value=function(content)
+        {
+            if(typeof this.element.value=="string")
+            {
+                if(typeof content=="string")
+                {
+                    this.element.value=content;
+                }
+                return this.element.value;
+            }
+            return NULL;
+        }
+
+    }
+
+	function getDesignation()
+	{
+        let titleSpan=$$$("title");
+        titleSpan.innerHTML("");
+        let code=$$$("code").value();
+
+        $$$.ajax({
+            'url':'servletTwo',
+            'data':{
+				'code':code
+			},
+			'methodType':'GET',
+			'success':function(responseData){
+				if(responseData=='INVAVLID')
+				{
+					alert("Invalid code : "+code);
+				}
+				else{
+                    alert(responseData);
+                    var designation=JSON.parse(responseData);
+                    titleSpan.innerHTML(designation.title);
+				}
+			},
+			'failure':function(){
+				alert("Some problem");
+			}
+        });
+	}
+
+</script>
+</head>
+
+<body>
+<h1>GET type reqeust with data Example</h1>
+Enter code<input type='text' id='code'>
+<button type='submit' onclick='getDesignation()'>Get Designation</button>
+<br><br>
+Title&nbsp&nbsp<span id='title'></span>
+<br>
+<a href='index.html'>Home</a>
+<body>
+
+</html>
